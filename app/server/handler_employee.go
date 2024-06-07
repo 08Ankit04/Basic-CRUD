@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/Basic-CRUD/model"
 	"github.com/go-chi/chi/v5"
@@ -15,6 +16,8 @@ const (
 	defaultPageLimit  = 5
 	defaultPageNumber = 1
 )
+
+var mu sync.Mutex
 
 func handlePaginationQuery(r *http.Request) (int64, int64) {
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
@@ -181,6 +184,9 @@ func (srv *Server) HandleCreateEmployee(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	mu.Lock()
+	defer mu.Unlock()
+
 	existingEmployee, err := srv.Redis.Get(ctx, fmt.Sprintf("employee:%d", employee.Id)).Result()
 	if err != nil && err != redis.Nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -239,6 +245,9 @@ func (srv *Server) HandleUpdateEmployee(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	mu.Lock()
+	defer mu.Unlock()
+
 	err = srv.Redis.Set(ctx, fmt.Sprintf("employee:%d", id), data, 0).Err()
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -271,6 +280,9 @@ func (srv *Server) HandleDeleteEmployee(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Unprocessable entity", http.StatusUnprocessableEntity)
 		return
 	}
+
+	mu.Lock()
+	defer mu.Unlock()
 
 	err = srv.Redis.Del(ctx, fmt.Sprintf("employee:%d", id)).Err()
 	if err != nil {
