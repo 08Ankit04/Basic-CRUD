@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 
@@ -12,9 +13,11 @@ import (
 
 func New(srv *server.Server, hd time.Duration, hdw time.Duration) *chi.Mux {
 	r := chi.NewRouter()
-	l := srv.Logger
 
-	l.Print("")
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -31,6 +34,11 @@ func New(srv *server.Server, hd time.Duration, hdw time.Duration) *chi.Mux {
 
 	r.Route("/api/v1", func(r chi.Router) {
 
+		r.Get("/employee", srv.HandleListEmployee)
+		r.Get("/employee/{id}", srv.HandleGetEmployee)
+		r.Post("/employee", srv.HandleCreateEmployee)
+		r.Put("/employee/{id}", srv.HandleUpdateEmployee)
+		r.Delete("/employee/{id}", srv.HandleDeleteEmployee)
 	})
 
 	return r
