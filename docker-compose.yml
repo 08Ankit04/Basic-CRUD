@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    env_file:
+      - ./docker/.env
+    ports:
+      - "8080:8080"
+    labels:
+      namespace: basic_crud
+      name: basic_crud
+    restart: always
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    # Specify the redis.conf file to use and add a password.
+    command: ["redis-server", "--requirepass", "vFhu32LwMlY35etMdt4fdsf4Es3r"]
+    ports: 
+      - "6379:6379"
