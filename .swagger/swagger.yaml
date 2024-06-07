@@ -1,0 +1,164 @@
+basePath: /api/v1
+definitions:
+  model.Employee:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      position:
+        type: string
+      salary:
+        type: number
+    type: object
+host: localhost:443
+info:
+  contact: {}
+  description: This is the API documentation of the basic-crud service
+  license:
+    name: MIT
+  title: Basic Crud service API
+  version: "0.1"
+paths:
+  /employee:
+    get:
+      consumes:
+      - application/json
+      description: Get employee list
+      parameters:
+      - default: "5"
+        description: number of employee details in one page
+        in: query
+        name: limit
+        type: string
+      - default: "1"
+        description: page number of employee
+        in: query
+        name: pageNumber
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Employee'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: list employee
+      tags:
+      - employee
+    post:
+      consumes:
+      - application/json
+      description: create employee
+      parameters:
+      - description: employee details in json format
+        in: body
+        name: model.Employee
+        required: true
+        schema:
+          $ref: '#/definitions/model.Employee'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "404":
+          description: Not Found
+        "409":
+          description: Conflict
+        "500":
+          description: Internal Server Error
+      summary: create employee details
+      tags:
+      - employee
+  /employee/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete employee details by id
+      parameters:
+      - description: employee ID in int format
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Delete Successful
+        "422":
+          description: Unprocessable entity
+        "500":
+          description: Internal Server Error
+      summary: delete employee details
+      tags:
+      - employee
+    get:
+      consumes:
+      - application/json
+      description: Get employee by id
+      parameters:
+      - description: employee ID in int format
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "404":
+          description: Not Found
+        "422":
+          description: Unprocessable entity
+        "500":
+          description: Internal Server Error
+      summary: get employee details
+      tags:
+      - employee
+    put:
+      consumes:
+      - application/json
+      description: update employee details by id
+      parameters:
+      - description: employee details in json format
+        in: body
+        name: model.Employee
+        required: true
+        schema:
+          $ref: '#/definitions/model.Employee'
+      - description: employee ID in int format
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "404":
+          description: Not Found
+        "422":
+          description: Unprocessable entity
+        "500":
+          description: Internal Server Error
+      summary: update employee details
+      tags:
+      - employee
+schemes:
+- http
+- https
+swagger: "2.0"

@@ -49,11 +49,11 @@ func handlePaginationQuery(r *http.Request) (int64, int64) {
 //	@router			/employee [GET]
 //	@accept			json
 //	@produce		json
-//	@param			limit	query	string	true	"number of employee details in one page" default(5)
-//	@param			pageNumber	query	string	true	"page number of employee" default(1)
+//	@param			limit	query	string	false	"number of employee details in one page" default(5)
+//	@param			pageNumber	query	string	false	"page number of employee" default(1)
 //
 //	@success		200				{array}	    model.Employee
-//	@failure		500				{object}	model.SrvError
+//	@failure		500				"Internal Server Error"
 func (srv *Server) HandleListEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -112,9 +112,9 @@ func (srv *Server) HandleListEmployee(w http.ResponseWriter, r *http.Request) {
 //	@param			id	path		string	true	"employee ID in int format"
 //
 //	@success		200				{object}	model.Employee
-//	@failure		404				{object}	model.SrvError
-//	@failure		422				{object}	model.SrvError
-//	@failure		500				{object}	model.SrvError
+//	@failure		404				"Not Found"
+//	@failure		422				"Unprocessable entity"
+//	@failure		500				"Internal Server Error"
 func (srv *Server) HandleGetEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -163,9 +163,9 @@ func (srv *Server) HandleGetEmployee(w http.ResponseWriter, r *http.Request) {
 //	@param			model.Employee	body	model.Employee	true	"employee details in json format"
 //
 //	@success		201				{object}	model.Employee
-//	@failure		404				{object}	model.SrvError
-//	@failure		409				{object}	model.SrvError
-//	@failure		500				{object}	model.SrvError
+//	@failure		404				"Not Found"
+//	@failure		409				"Conflict"
+//	@failure		500				"Internal Server Error"
 func (srv *Server) HandleCreateEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -215,9 +215,9 @@ func (srv *Server) HandleCreateEmployee(w http.ResponseWriter, r *http.Request) 
 //	@param			id	path		string	true	"employee ID in int format"
 //
 //	@success		200				{object}	model.Employee
-//	@failure		404				{object}	model.SrvError
-//	@failure		422				{object}	model.SrvError
-//	@failure		500				{object}	model.SrvError
+//	@failure		404				"Not Found"
+//	@failure		422				"Unprocessable entity"
+//	@failure		500				"Internal Server Error"
 func (srv *Server) HandleUpdateEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -261,8 +261,8 @@ func (srv *Server) HandleUpdateEmployee(w http.ResponseWriter, r *http.Request) 
 //	@param			id	path		string	true	"employee ID in int format"
 //
 //	@success		200				"Delete Successful"
-//	@failure		422				{object}	model.SrvError
-//	@failure		500				{object}	model.SrvError
+//	@failure		422				"Unprocessable entity"
+//	@failure		500				"Internal Server Error"
 func (srv *Server) HandleDeleteEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 

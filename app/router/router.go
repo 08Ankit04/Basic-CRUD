@@ -2,7 +2,6 @@ package router
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -11,7 +10,7 @@ import (
 	"github.com/Basic-CRUD/app/server"
 )
 
-func New(srv *server.Server, hd time.Duration, hdw time.Duration) *chi.Mux {
+func New(srv *server.Server) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)

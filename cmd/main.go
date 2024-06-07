@@ -41,7 +41,7 @@ func main() {
 	srv := server.New(appCache, appLogger, appValidator)
 
 	// Get server routes
-	appRouter := router.New(srv, appConf.Server.HandlerTimeout, appConf.Server.TimeoutWrite)
+	appRouter := router.New(srv)
 
 	// Create server
 	address := fmt.Sprintf(":%d", appConf.Server.Port)
