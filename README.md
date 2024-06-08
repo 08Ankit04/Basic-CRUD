@@ -13,8 +13,19 @@ This is a simple REST API for managing employees using Go, Redis, and the Chi ro
 
 ```sh
 git clone https://github.com/08Ankit04/basic-crud.git
-cd employee-management-api
+cd basic-crud
 
 docker-compose up
 
+```
+
+## Running Tests
+
+### Unit Tests
+
+To run unit tests and see the coverage percentage, execute the following command:
+
+```sh
+cd basic-crud/app/server
+go test -cover -v ./...
 ```
