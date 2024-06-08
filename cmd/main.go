@@ -33,12 +33,15 @@ func main() {
 
 	// Get Redis connection
 	appCache := redis.New(&appConf.RedisHosts)
+	redisWrapper := server.NewRedisWrapper(appCache)
+
+	
 
 	// Get validator
 	appValidator := validator.New()
 
 	// Set server dependencies
-	srv := server.New(appCache, appLogger, appValidator)
+	srv := server.New(redisWrapper, appLogger, appValidator)
 
 	// Get server routes
 	appRouter := router.New(srv)

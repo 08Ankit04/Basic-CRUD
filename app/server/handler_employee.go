@@ -58,11 +58,9 @@ func handlePaginationQuery(r *http.Request) (int64, int64) {
 //	@success		200				{array}	    model.Employee
 //	@failure		500				"Internal Server Error"
 func (srv *Server) HandleListEmployee(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	limit, offset := handlePaginationQuery(r)
 
-	keys, err := srv.Redis.Keys(ctx, "employee:*").Result()
+	keys, err := srv.Redis.Keys("employee:*").Result()
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -81,7 +79,7 @@ func (srv *Server) HandleListEmployee(w http.ResponseWriter, r *http.Request) {
 
 	employees := make([]model.Employee, 0, limit)
 	for _, key := range keys[offset:end] {
-		data, err := srv.Redis.Get(ctx, key).Result()
+		data, err := srv.Redis.Get(key).Result()
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -119,15 +117,13 @@ func (srv *Server) HandleListEmployee(w http.ResponseWriter, r *http.Request) {
 //	@failure		422				"Unprocessable entity"
 //	@failure		500				"Internal Server Error"
 func (srv *Server) HandleGetEmployee(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "Unprocessable entity", http.StatusUnprocessableEntity)
 		return
 	}
 
-	data, err := srv.Redis.Get(ctx, "employee:"+strconv.Itoa(id)).Result()
+	data, err := srv.Redis.Get("employee:" + strconv.Itoa(id)).Result()
 	if err != nil && err != redis.Nil {
 		srv.Logger.Print(err)
 
@@ -170,8 +166,6 @@ func (srv *Server) HandleGetEmployee(w http.ResponseWriter, r *http.Request) {
 //	@failure		409				"Conflict"
 //	@failure		500				"Internal Server Error"
 func (srv *Server) HandleCreateEmployee(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	var employee model.Employee
 	if err := json.NewDecoder(r.Body).Decode(&employee); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -187,18 +181,18 @@ func (srv *Server) HandleCreateEmployee(w http.ResponseWriter, r *http.Request) 
 	mu.Lock()
 	defer mu.Unlock()
 
-	existingEmployee, err := srv.Redis.Get(ctx, fmt.Sprintf("employee:%d", employee.Id)).Result()
+	existingEmployee, err := srv.Redis.Get(fmt.Sprintf("employee:%d", employee.Id)).Result()
 	if err != nil && err != redis.Nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	if existingEmployee != "" {
+	if existingEmployee != "" && existingEmployee != "{}" && err != redis.Nil {
 		http.Error(w, "Conflict", http.StatusConflict)
 		return
 	}
 
-	err = srv.Redis.Set(ctx, fmt.Sprintf("employee:%d", employee.Id), data, 0).Err()
+	err = srv.Redis.Set(fmt.Sprintf("employee:%d", employee.Id), data, 0).Err()
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -225,8 +219,6 @@ func (srv *Server) HandleCreateEmployee(w http.ResponseWriter, r *http.Request) 
 //	@failure		422				"Unprocessable entity"
 //	@failure		500				"Internal Server Error"
 func (srv *Server) HandleUpdateEmployee(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "Unprocessable entity", http.StatusUnprocessableEntity)
@@ -248,7 +240,7 @@ func (srv *Server) HandleUpdateEmployee(w http.ResponseWriter, r *http.Request) 
 	mu.Lock()
 	defer mu.Unlock()
 
-	err = srv.Redis.Set(ctx, fmt.Sprintf("employee:%d", id), data, 0).Err()
+	err = srv.Redis.Set(fmt.Sprintf("employee:%d", id), data, 0).Err()
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -273,8 +265,6 @@ func (srv *Server) HandleUpdateEmployee(w http.ResponseWriter, r *http.Request) 
 //	@failure		422				"Unprocessable entity"
 //	@failure		500				"Internal Server Error"
 func (srv *Server) HandleDeleteEmployee(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "Unprocessable entity", http.StatusUnprocessableEntity)
@@ -284,7 +274,7 @@ func (srv *Server) HandleDeleteEmployee(w http.ResponseWriter, r *http.Request) 
 	mu.Lock()
 	defer mu.Unlock()
 
-	err = srv.Redis.Del(ctx, fmt.Sprintf("employee:%d", id)).Err()
+	err = srv.Redis.Del(fmt.Sprintf("employee:%d", id)).Err()
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
